@@ -23,9 +23,8 @@ if __name__=="__main__":
     GL.params['Dphi_Dx']=0.1
     GL.params['Gamma_phi']=0.1
     GL.params['kappa']=0.1
-    GL.params['Ee']=0.1
 
-
+    GL.set_driving(lambda x:np.exp[-0.5* (x- 5)**2]*np.cos(2*(x - 5)))
 
     def equations(t,y,params,driving):
         '''
