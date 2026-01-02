@@ -62,11 +62,14 @@ class GL_equations:
             raise MissingGLComponents("Missing Boundary conditions")
         
         if self.equations is None:
-            raise MissingGLComponents("Missing function to solve")
+            raise MissingGLComponents("Missing function")
 
         if not self.time_span:
-            raise MissingGLComponents("Timespan is not defined")
+            raise MissingGLComponents("Missing timespan")
         
+        if not self.params:
+            raise MissingGLComponents("Missing parameters")
+
         res=solve_ivp(
             self.equations,
             t_span=self.time_span[0],
