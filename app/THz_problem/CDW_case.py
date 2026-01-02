@@ -27,7 +27,7 @@ if __name__=="__main__":
 
 
 
-    def equations(t,y,params):
+    def equations(t,y,params,driving):
         '''
         We need 2*2 eq
         '''    
@@ -46,7 +46,7 @@ if __name__=="__main__":
             params['U']*y[0]*np.sin(params['q_0']*params['x'] + y[1])\
                 -2.*params['c_phi']* y[0]**2*params['Dphi_Dx']\
                     -params['Gamma_phi']*phi_dot\
-                          + params['kappa']*params['Ee']\
+                          + params['kappa']*driving(t)\
                     )/params['m_phi']
 
         return [A_dot,phi_dot,A_dot_dot,phi_dot_dot]
