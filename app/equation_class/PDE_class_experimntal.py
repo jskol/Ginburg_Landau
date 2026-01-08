@@ -77,25 +77,16 @@ class GL_equations_set:
             "A" : "A_dot",
             "phi" : "phi_dot",
             "A_dot" : f"(\
-                -2.*{self.params['a']}*A\
-                -4.*{self.params['b']}*(A**3)\
-                -2.*{self.params['c_phi']}*A* (diff(phi,x)**2)\
-                -{self.params['impurity']}*cos(x*{self.params['q_0']} + phi)\
-                -2.*{self.params['c_A']}*diff(A,x)**2\
-                -{self.params['Gamma_A']}*A_dot)/{self.params['m_A']}",
-            "phi_dot" : f"(\
-                {self.params['impurity']}*A*sin({self.params['q_0']}*x + phi)\
-                +4.*{self.params['c_phi']}*A*diff(phi,x)*diff(A,x)\
-                +2.*{self.params['c_phi']}*(A**2)*diff(phi,x)**2\
-                -{self.params['Gamma_phi']}*phi_dot\
-                +{self.params['kappa']}*{self.driving})/{self.params['m_phi']}"
-            }
+                -2.*{self.params['a']}*A)",
+            "phi_dot" : f"0"            }
+            
             ,bc={
                 "A":{"value":self.boundary_conditions["A"]},
                 "phi":{"value":self.boundary_conditions["phi"]},
                 "A_dot":{"value":self.boundary_conditions["A_dot"]},
                 "phi_dot":{"value":self.boundary_conditions["phi_dot"]}
             }
+            
         )
         self.equations=eq
 
@@ -113,31 +104,17 @@ class GL_equations_set:
 
     def set_driving(self,func:str)->None:
         self.driving=func
-    
-    
-    
-    def solve(self,file='out_file.hdf5',solver_num:int =-2):
-        #Registered solvers are:
-        solvers_list=[
-        'AdaptiveSolverBase',
-        'adams–bashforth',
-        'crank-nicolson',
-        'euler',
-        'explicit',
-        'explicit_mpi',
-        'implicit',
-        'runge-kutta',
-        'scip'
-        ]
+
+    def solve(self,file='out_file.hdf5'):
         storage=pde.FileStorage(file)
         if self.equations is None:
             self.set_equations()
         
         es = self.equations.solve(
             self.state, 
-            t_range=self.time_domain[0],
-              dt=self.time_domain[1], 
-              tracker=storage.tracker(0.1),
-              solver=solvers_list[solver_num]
-              )  # solve the PDE
+            t_range=self.time_domain[0], 
+            dt=self.time_domain[1], 
+            tracker=storage.tracker(0.1),
+            solver="runge-kutta" 
+            )  # solve the PDE
         return es
