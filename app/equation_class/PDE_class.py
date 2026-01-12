@@ -138,6 +138,7 @@ class GL_equations_set:
             t_range=self.time_domain[0],
               dt=self.time_domain[1], 
               tracker=storage.tracker(0.1),
-              solver=solvers_list[solver_num]
+              solver='runge-kutta',
+              backend='numpy'#solvers_list[solver_num]
               )  # solve the PDE
         return es
