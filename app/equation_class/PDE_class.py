@@ -67,38 +67,6 @@ class GL_equations_set:
         )
         self.equations=eq
 
-    def set_equations_ref(self)->None:
-        #If not specified define BC
-        if self.boundary_conditions is None:
-            print("Setting default BC")
-            self.set_bc()
-
-        eq=pde.PDE({
-            "A" : "A_dot",
-            "phi" : "phi_dot",
-            "A_dot" : f"(\
-                -2.*{self.params['a']}*A\
-                -4.*{self.params['b']}*(A**3)\
-                -2.*{self.params['c_phi']}*A* (diff(phi,x)**2)\
-                -{self.params['impurity']}*cos(x*{self.params['q_0']} + phi)\
-                -2.*{self.params['c_A']}*diff(A,x)**2\
-                -{self.params['Gamma_A']}*A_dot)/{self.params['m_A']}",
-            "phi_dot" : f"(\
-                {self.params['impurity']}*A*sin({self.params['q_0']}*x + phi)\
-                +4.*{self.params['c_phi']}*A*diff(phi,x)*diff(A,x)\
-                +2.*{self.params['c_phi']}*(A**2)*diff(phi,x)**2\
-                -{self.params['Gamma_phi']}*phi_dot\
-                +{self.params['kappa']}*{self.driving})/{self.params['m_phi']}"
-            }
-            ,bc={
-                "A":{"value":self.boundary_conditions["A"]},
-                "phi":{"value":self.boundary_conditions["phi"]},
-                "A_dot":{"value":self.boundary_conditions["A_dot"]},
-                "phi_dot":{"value":self.boundary_conditions["phi_dot"]}
-            }
-        )
-        self.equations=eq
-
 
     def set_init_state(self,phi_0:float=0)->None:
         state=pde.FieldCollection(
@@ -133,7 +101,7 @@ class GL_equations_set:
         if self.equations is None:
             self.set_equations()
         
-        es = self.equations.solve(
+        res = self.equations.solve(
             self.state, 
             t_range=self.time_domain[0],
               dt=self.time_domain[1], 
@@ -141,4 +109,4 @@ class GL_equations_set:
               solver='runge-kutta',
               backend='numpy'#solvers_list[solver_num]
               )  # solve the PDE
-        return es
+        return res
