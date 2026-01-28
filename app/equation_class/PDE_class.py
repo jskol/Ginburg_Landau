@@ -50,7 +50,7 @@ class GL_equations_set:
                 -2.*{self.params['a']}*A\
                 -4.*{self.params['b']}*(A**3)\
                 -2.*{self.params['c_A']}*diff(A,x)\
-                -2.*{self.params['c_phi']}*A* (diff(phi,x)**2)\
+                -2.*{self.params['c_phi']}*A*laplace(phi)\
                 -{self.params['Gamma_A']}*A_dot)/{self.params['m_A']}",
             "phi_dot" : f"(\
                 {self.params['impurity']}*A*sin({self.params['q_0']}*x + phi)\
@@ -77,6 +77,7 @@ class GL_equations_set:
                 pde.ScalarField.from_expression(self.grid, "0")
             ]
         )
+        #state[0].add_ghost
         self.state=state
 
     def set_driving(self,func:str)->None:
@@ -97,7 +98,9 @@ class GL_equations_set:
         'runge-kutta',
         'scip'
         ]
-        storage=pde.FileStorage(file)
+        #storage=pde.FileStorage(file)
+        storage=pde.MemoryStorage()
+
         if self.equations is None:
             self.set_equations()
         
@@ -107,6 +110,6 @@ class GL_equations_set:
               dt=self.time_domain[1], 
               tracker=storage.tracker(0.1),
               solver='runge-kutta',
-              backend='numpy'#solvers_list[solver_num]
+              backend='numpy'
               )  # solve the PDE
         return res
