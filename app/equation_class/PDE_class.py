@@ -63,14 +63,16 @@ class GL_equations_set:
         self.equations=eq
 
 
-    def set_init_state(self)->None:
+    def set_init_state(self,custom_A:str=None)->None:
         A_amp=self.boundary_conditions['A']
-        phi_0=self.boundary_conditions['phi']
-        if A_amp is None:
-            A_init=f"sin({self.params['q_0']}*x)"
-        else:
-            A_init=f'{A_amp}'
 
+        if custom_A is None:
+            A_init=A_amp
+        else:
+            A_init=custom_A
+
+          
+        phi_0=self.boundary_conditions['phi']
         state=pde.FieldCollection(
             [
                 pde.ScalarField.from_expression(self.grid, A_init,label='A'),
@@ -87,8 +89,7 @@ class GL_equations_set:
         self.driving=func
     
     
-    
-    def solve(self,file='out_file.hdf5',solver_num:int =-2):
+    def solve(self,solver_num:int =-2):
         #Registered solvers are:
         solvers_list=[
         'AdaptiveSolverBase',
@@ -110,9 +111,9 @@ class GL_equations_set:
         res = self.equations.solve(
             self.state, 
             t_range=self.time_domain[0],
-              dt=self.time_domain[1], 
-              tracker=storage.tracker(0.1),
-              solver='runge-kutta',
-              backend='numpy'
+            dt=self.time_domain[1], 
+            tracker=storage.tracker(0.1),
+            solver=solvers_list[solver_num],
+            backend='numpy'
               )  # solve the PDE
-        return res
+        return storage
