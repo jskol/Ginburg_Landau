@@ -22,7 +22,7 @@ def create_layout(sys_size:int,solutions_to_showcase:dict[str,int]):
         ),
         "yaxis":dict( 
             title=next(iter_to_keys),
-            range=[-5,5],
+            range=[0,5],
             autorange=False, 
             showgrid=False,
             fixedrange=False
