@@ -63,17 +63,25 @@ class GL_equations_set:
         self.equations=eq
 
 
-    def set_init_state(self,phi_0:float=0)->None:
+    def set_init_state(self)->None:
+        A_amp=self.boundary_conditions['A']
+        phi_0=self.boundary_conditions['phi']
+        if A_amp is None:
+            A_init=f"sin({self.params['q_0']}*x)"
+        else:
+            A_init=f'{A_amp}'
+
         state=pde.FieldCollection(
             [
-                pde.ScalarField.from_expression(self.grid, f"cos({self.params['q_0']}*x+{phi_0})"),
-                pde.ScalarField.from_expression(self.grid, f"{phi_0}"),
-                pde.ScalarField.from_expression(self.grid, "0"),
-                pde.ScalarField.from_expression(self.grid, "0")
-            ]
-        )
-        #state[0].add_ghost
+                pde.ScalarField.from_expression(self.grid, A_init,label='A'),
+                pde.ScalarField.from_expression(self.grid, f"{phi_0}",label='phi'),
+                pde.ScalarField(self.grid, 0,label='A_dot'),
+                pde.ScalarField(self.grid, 0,label='phi_dot')
+            ])
+        state[0].set_ghost_cells({'value':A_amp})
+        state[1].set_ghost_cells({'value':phi_0})
         self.state=state
+
 
     def set_driving(self,func:str)->None:
         self.driving=func
