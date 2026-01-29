@@ -46,23 +46,18 @@ class GL_equations_set:
             "A" : "A_dot",
             "phi" : "phi_dot",
             "A_dot" : f"(\
-                -{self.params['impurity']}*cos(x*{self.params['q_0']} + phi)\
-                -2.*{self.params['a']}*A\
-                -4.*{self.params['b']}*(A**3)\
-                -2.*{self.params['c_A']}*diff(A,x)\
-                -2.*{self.params['c_phi']}*A*laplace(phi)\
-                -{self.params['Gamma_A']}*A_dot)/{self.params['m_A']}",
+                -1.*{self.params['impurity']}*cos(x*{self.params['q_0']} + phi)\
+                -2.*({self.params['a']})*A\
+                -4.*({self.params['b']})*(A**3)\
+                +2.*({self.params['c_A']})*laplace(A)\
+                -2.*({self.params['c_phi']})*A*(d_dx(phi))**2\
+                -1.*({self.params['Gamma_A']})*A_dot)/{self.params['m_A']}",
             "phi_dot" : f"(\
-                {self.params['impurity']}*A*sin({self.params['q_0']}*x + phi)\
-                -2.*{self.params['c_phi']}*(A**2)*diff(phi,x)\
-                -{self.params['Gamma_phi']}*phi_dot\
-                +{self.params['kappa']}*{self.driving})/{self.params['m_phi']}"
-            }
-            ,bc={
-                "A":{"value":self.boundary_conditions["A"]},
-                "phi":{"value":self.boundary_conditions["phi"]},
-                "A_dot":{"value":self.boundary_conditions["A_dot"]},
-                "phi_dot":{"value":self.boundary_conditions["phi_dot"]}
+                ({self.params['impurity']})*A*sin({self.params['q_0']}*x + phi)\
+                +2.*({self.params['c_phi']})*(A**2)*laplace(phi)\
+                +4.*({self.params['c_phi']})*A*d_dx(A)*d_dx(phi)\
+                -1.*({self.params['Gamma_phi']})*phi_dot\
+                +1.*({self.params['kappa']})*{self.driving})/{self.params['m_phi']}"
             }
         )
         self.equations=eq
