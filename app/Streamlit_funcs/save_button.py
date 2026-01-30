@@ -16,7 +16,7 @@ def generate_save_button(pde_solution:pde.storage.memory.MemoryStorage, out_name
     if st.button(label='Prepare data'):
         save_PDE_to_file(pde_solution,out_name)
 
-
+@st.fragment
 def generate_download_button(pde_solution:pde.storage.memory.MemoryStorage)->None:
     #Create locally the out-file
     # Make download button    
