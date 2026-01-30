@@ -41,7 +41,8 @@ with tab_time_evolution:
     display_time_evolution_sample()
 
 from Streamlit_funcs.Local_evolution_tab import display_time_evolution_local
-
+with tab_FT:
+    display_time_evolution_local()
 
 
 

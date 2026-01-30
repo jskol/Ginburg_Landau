@@ -27,7 +27,7 @@ def sidebar_content(params: dict[str,float|str]):
 
     with st.expander('impurity'):
         # store the value so that its not reset after N is changed
-        if 'imp_loc' not in st.sesssion_state:
+        if 'imp_loc' not in st.session_state:
             st.session_state.imp_loc=round(0.5*params['N'],1)
         imp_loc=st.select_slider('Impurity location',options=np.arange(0,params['N'],0.1),value=st.session_state.imp_loc,on_change=restart_run_button)
         st.session_state.imp_loc=imp_loc

@@ -10,14 +10,14 @@ class GL_equations_set:
     time_domain: tuple[float,float]=(100,1e-1) # tuple with t_max and t_mesh
     grid=None
 
-    def __init__(self,params_dict:dict[str,float],t_max, t_mesh,x_mesh):
+    def __init__(self,params_dict:dict[str,float|str],t_max, t_mesh,x_mesh):
         '''
         Attach a dict of parameters
         to the G-L equations
         '''
         self.params=params_dict
         self.time_domain=(t_max,t_mesh)
-        self.grid=pde.CartesianGrid([[0,self.params['N']]],[self.params['N']*x_mesh],periodic=False)
+        self.grid=pde.CartesianGrid([(0.,float(self.params['N']))],[self.params['N']*x_mesh],periodic=False)
     
     def set_bc(self,
                A_0:float=1.,
@@ -63,7 +63,7 @@ class GL_equations_set:
         self.equations=eq
 
 
-    def set_init_state(self,custom_A:str=None)->None:
+    def set_init_state(self,custom_A:str|None=None)->None:
         A_amp=self.boundary_conditions['A']
 
         if custom_A is None:

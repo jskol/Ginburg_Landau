@@ -5,11 +5,11 @@ sys.path.append(os.path.dirname(curr_dir))
 from equation_class.PDE_class import GL_equations_set
 
 
-def init_PDE(params:dict[str, float| str]):
+def init_PDE(params:dict[str, float|str]):
     GL_PDE=GL_equations_set(params,params['t_max'],0.1,10) #create instance
-    GL_PDE.set_driving(params['driving']) # update driving pulse
+    GL_PDE.set_driving(str(params['driving'])) # update driving pulse
     #Set boundary conditions
-    A0=np.sqrt(-params['a']/(2.*params['b'])) if params['a']<0 and params['b']!= 0 else 0
+    A0=np.sqrt(-float(params['a'])/(2.*float(params['b']))) if float(params['a'])<0 and params['b']!= 0 else 0
     GL_PDE.set_bc(A_0=A0)
     #set initial state
     shift = 0.1  if A0==0 else 0.1
