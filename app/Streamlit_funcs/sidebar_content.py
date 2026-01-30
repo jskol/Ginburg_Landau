@@ -8,8 +8,6 @@ from equation_class.GL_equations_params import params_name_dict
 
 
 # run_button functionalities ##
-if 'run_button_active' not in st.session_state:
-    st.session_state.run_button_active=True
 def restart_run_button():
     st.session_state.run_button_active=True
 def disable_run_button():

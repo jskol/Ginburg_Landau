@@ -10,6 +10,8 @@ sys.path.append(curr_dir)
 from Streamlit_funcs.sidebar_content import sidebar_content
 with st.sidebar:
     params={} #initiate empty dict of params
+    if 'run_button_active' not in st.session_state:
+        st.session_state.run_button_active=True
     sidebar_content(params)
 
 ## Now the main page
