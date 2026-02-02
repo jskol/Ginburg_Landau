@@ -1,12 +1,19 @@
 import os,sys
 import numpy as np
+from dataclasses import dataclass 
 curr_dir=os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(curr_dir))
 from equation_class.PDE_class import GL_equations_set
 
+@dataclass
+class sym_details:
+    t_step:float=0.1
+    x_points_per_unit:int=10
 
-def init_PDE(params:dict[str, float|str]):
-    GL_PDE=GL_equations_set(params,params['t_max'],0.1,10) #create instance
+
+def init_PDE(params:dict[str, float|str],sym_details: sym_details):
+
+    GL_PDE=GL_equations_set(params,params['t_max'],sym_details.t_step,sym_details.x_points_per_unit) #create instance
     GL_PDE.set_driving(str(params['driving'])) # update driving pulse
     #Set boundary conditions
     A0=np.sqrt(-float(params['a'])/(2.*float(params['b']))) if float(params['a'])<0 and params['b']!= 0 else 0

@@ -1,10 +1,14 @@
 import plotly.graph_objects as go
 import streamlit as st
 import numpy as np
-import pde
+
+import os,sys
+curr_dir=os.path.dirname(os.path.abspath(__file__))
+sys.path.append(curr_dir)
+from init_PDE import sym_details
 
 @st.fragment
-def display_time_evolution_local():
+def display_time_evolution_local(simulation_details:sym_details):
 
     if st.session_state.has_data:
         data_PDE=np.array(st.session_state.PDE_res.data)
@@ -12,24 +16,28 @@ def display_time_evolution_local():
        
         st.header('Evolution of the space-resolved profile',divider=True,text_alignment='center')
         st.text(f'Impurity is at x={st.session_state.imp_loc}')
-        r_space_locations=np.arange(data_PDE[0].shape[-1])
+        r_space_locations=np.arange(data_PDE[0].shape[-1])/simulation_details.x_points_per_unit
 
         tickers = st.multiselect(
             "Choose x locations to display",
             options=r_space_locations,
             placeholder="Pick x's",
+            format_func=lambda x: f'{x:.2f}',
             accept_new_options=True,
-            default=[0,r_space_locations[len(r_space_locations)//2]]
+            default=[0]
         )
+
+        tickers_loc=[int(x*simulation_details.x_points_per_unit) for x in tickers] #to go back to integers
+
         cols=st.columns(2)
         for it, data_name in enumerate([r'$A(x,t)$',r'$\phi(x,t)$']):
             fig=go.Figure(
                 data=[ 
                     go.Scatter(
                         x=t_range,y=data_PDE[:,it,x_loc],
-                        mode='lines+markers',name=f'x={x_loc}'
+                        mode='lines+markers',name=f'x={(x_loc/simulation_details.x_points_per_unit):.2f}'
                     
-                    ) for x_loc in tickers
+                    ) for x_loc in tickers_loc
                 ],
                 layout=(
                     dict(
@@ -48,6 +56,7 @@ def display_time_evolution_local():
             "Choose t_periods",
             options=t_range,
             placeholder="Picked t's",
+            format_func=lambda x: f'{x:.2f}',
             accept_new_options=True,
             default=[t_range[0],t_range[-1]]
         )
@@ -68,7 +77,7 @@ def display_time_evolution_local():
             for it, data_name in enumerate([r'$A(x,\omega)$',r'$\phi(x,\omega)$']):                
                 with cols[it].container(border=True) as cont:
                     #Calculate FFT once and then post-process it
-                    FT_data=np.array([np.fft.fft(data_PDE[t_init_loc:t_end_loc,it,x_loc]) for x_loc in tickers])
+                    FT_data=np.array([np.fft.fft(data_PDE[t_init_loc:t_end_loc,it,x_loc]) for x_loc in tickers_loc])
                     omega_range=np.arange(len(FT_data[0])//2)
 
                     def create_fig_data(func,data_set,points_set):
@@ -80,7 +89,7 @@ def display_time_evolution_local():
                         return [
                             go.Scatter(
                                 x=omega_range,y=(func)(data_subset),
-                                mode='lines+markers',name=f'x={points_set[temp_it]}'
+                                mode='lines+markers',name=f'x={(points_set[temp_it]/simulation_details.x_points_per_unit):.2f}'
                             ) for temp_it,data_subset in enumerate(data_set)
 
                         ]

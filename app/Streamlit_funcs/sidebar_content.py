@@ -31,7 +31,7 @@ def sidebar_content(params: dict[str,float|str]):
             st.session_state.imp_loc=round(0.5*params['N'],1)
         imp_loc=st.select_slider('Impurity location',options=np.arange(0,params['N'],0.1),value=st.session_state.imp_loc,on_change=restart_run_button)
         st.session_state.imp_loc=imp_loc
-        imp_stength=st.select_slider('Impurity strength',options=np.arange(0,1,0.1),value=0,format_func=lambda x: f'{x:.2f}',on_change=restart_run_button)
+        imp_stength=st.select_slider('Impurity strength',options=np.arange(0,200,1),value=125,format_func=lambda x: f'{x:.2f}',on_change=restart_run_button)
         params['impurity']=f'-{imp_stength} *exp(-(x-{imp_loc})**2 )/(1**2)'
 
     with st.expander('Driving'):

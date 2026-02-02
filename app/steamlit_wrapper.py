@@ -20,8 +20,10 @@ st.set_page_config(layout="wide")
 st.markdown("<h1 style='text-align: center;'>G-L simulation</h1>", unsafe_allow_html=True)
 
 #initiate Solver for PDE
-from Streamlit_funcs.init_PDE import init_PDE
-GL_PDE=init_PDE(params)
+from Streamlit_funcs.init_PDE import init_PDE,sym_details
+
+simulation_details=sym_details(t_step=0.1,x_points_per_unit=10)
+GL_PDE=init_PDE(params,simulation_details)
 
 
 #Solve the thing
@@ -35,14 +37,17 @@ if st.session_state.run_calc:
     st.session_state.has_data=True
     st.session_state.run_calc=False
 
-tab_time_evolution,tab_FT = st.tabs(['Time evolution sample','Time evolution local'])
+tab_time_evolution,tab_FT,tab_CDW = st.tabs(['Time evolution sample','Time evolution local','Charge density'])
 from Streamlit_funcs.Sample_tab import display_time_evolution_sample
 with tab_time_evolution:
     display_time_evolution_sample()
 
 from Streamlit_funcs.Local_evolution_tab import display_time_evolution_local
 with tab_FT:
-    display_time_evolution_local()
+    display_time_evolution_local(simulation_details)
 
 
+from Streamlit_funcs.Charge_density_tab import CDW_tab
+with tab_CDW:
+    CDW_tab(params,simulation_details)
 

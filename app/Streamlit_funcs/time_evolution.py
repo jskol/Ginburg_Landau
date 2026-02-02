@@ -7,6 +7,7 @@ from plotly.subplots import make_subplots
 
 
 
+
 def create_layout(sys_size:int,solutions_to_showcase:dict[str,int]):    
     iter_to_keys=iter(solutions_to_showcase)
     
@@ -22,8 +23,7 @@ def create_layout(sys_size:int,solutions_to_showcase:dict[str,int]):
         ),
         "yaxis":dict( 
             title=next(iter_to_keys),
-            range=[0,5],
-            autorange=False, 
+            autorange=True, 
             showgrid=False,
             fixedrange=False
         ),
