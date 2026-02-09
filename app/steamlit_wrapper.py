@@ -7,7 +7,7 @@ sys.path.append(curr_dir)
 
 
 ## Create a sidebar to set the parameters of the model
-from Streamlit_funcs.sidebar_content import sidebar_content
+from Streamlit_funcs.sidebar_content import sidebar_content,restart_run_button
 with st.sidebar:
     params={} #initiate empty dict of params
     if 'run_button_active' not in st.session_state:
