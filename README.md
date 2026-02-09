@@ -1,0 +1,1 @@
+For a running demo visit the [streamlit site](https://ginzburglandau-thz.streamlit.app/)  of the project
