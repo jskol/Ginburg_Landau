@@ -5,10 +5,10 @@ import numpy as np
 import os,sys
 curr_dir=os.path.dirname(os.path.abspath(__file__))
 sys.path.append(curr_dir)
-from init_PDE import sym_details
+from init_PDE import SimDetails
 
 @st.fragment
-def display_time_evolution_local(simulation_details:sym_details):
+def display_time_evolution_local(simulation_details:SimDetails):
 
     if st.session_state.has_data:
         data_PDE=np.array(st.session_state.PDE_res.data)
@@ -89,7 +89,7 @@ def display_time_evolution_local(simulation_details:sym_details):
                         return [
                             go.Scatter(
                                 x=omega_range,y=(func)(data_subset),
-                                mode='lines+markers',name=f'x={(points_set[temp_it]/simulation_details.x_points_per_unit):.2f}'
+                                mode='lines+markers',name=f'x={(points_set[temp_it]):.2f}'
                             ) for temp_it,data_subset in enumerate(data_set)
 
                         ]
@@ -100,7 +100,7 @@ def display_time_evolution_local(simulation_details:sym_details):
                     )
                     fig_re.update_layout({"yaxis":dict(title=f'Re({data_name})')})
                     fig_im=go.Figure(
-                        data=create_fig_data(lambda x: -np.imag(x),FT_data,tickers),
+                        data=create_fig_data(lambda x: np.abs(np.imag(x)),FT_data,tickers),
                         layout=layout_for_FT
                     )
                     fig_im.update_layout({"yaxis":dict(title=f'-Im({data_name})')})

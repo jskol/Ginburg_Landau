@@ -89,7 +89,7 @@ class GL_equations_set:
         self.driving=func
     
     
-    def solve(self,solver_num:int =-2):
+    def solve(self,solver_num:int =-2,to_file:bool=False):
         #Registered solvers are:
         solvers_list=[
         'AdaptiveSolverBase',
@@ -102,12 +102,14 @@ class GL_equations_set:
         'runge-kutta',
         'scip'
         ]
-        #storage=pde.FileStorage(file)
-        storage=pde.MemoryStorage()
+        if to_file:
+            storage=pde.FileStorage('out.hdmf5')
+        else:
+            storage=pde.MemoryStorage()
 
         if self.equations is None:
             self.set_equations()
-        
+                
         res = self.equations.solve(
             self.state, 
             t_range=self.time_domain[0],

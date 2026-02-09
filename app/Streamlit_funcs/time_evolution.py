@@ -5,6 +5,10 @@ import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
+import os,sys
+curr_dir=os.path.dirname(os.path.abspath(__file__))
+sys.path.append(curr_dir)
+from init_PDE import SimDetails
 
 
 
@@ -43,7 +47,7 @@ def create_layout(sys_size:int,solutions_to_showcase:dict[str,int]):
 
 
 
-def add_time_evolution_slider(data_PDE:pde.storage.memory.MemoryStorage)->None:
+def add_time_evolution_slider(data_PDE:pde.storage.memory.MemoryStorage,sim_details:SimDetails)->None:
     '''
     Docstring for add_time_evolution_slider
     This function creates a plotly slider figure 
@@ -61,7 +65,7 @@ def add_time_evolution_slider(data_PDE:pde.storage.memory.MemoryStorage)->None:
     }
 
     fig=make_subplots(rows=2,cols=1,shared_xaxes=True,vertical_spacing=0.05)
-    x_axis=np.arange(data_PDE.data[0].shape[-1])
+    x_axis=np.arange(data_PDE.data[0].shape[-1])/sim_details.x_points_per_unit
     #fix phase
     #for data_set in data_PDE.data:
     #    data_set[1] = np.mod(data_set[1]+np.pi,2*np.pi)-np.pi
@@ -79,7 +83,7 @@ def add_time_evolution_slider(data_PDE:pde.storage.memory.MemoryStorage)->None:
         frame_name=f"{time_step:.1f}"
         frames[frame_name]=go.Frame(
                 data=[
-                    go.Scatter(y=data_set[sol]) for sol in solutions_to_showcase.values()
+                    go.Scatter(x=x_axis,y=data_set[sol]) for sol in solutions_to_showcase.values()
                 ],
                 name=frame_name
             )
