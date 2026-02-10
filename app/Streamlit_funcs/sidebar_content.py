@@ -53,7 +53,7 @@ def sidebar_content(params: dict[str,float|str]):
         params['impurity']=imp_str
 
     with st.expander('Driving'):
-        driving_str=st.select_slider('Pulse strength',options=np.arange(-2.1, 2.1, 0.1),value=0.,format_func=lambda x: f'{x:.2f}',on_change=restart_run_button)
+        driving_str=st.select_slider('Pulse strength',options=np.arange(-4.1, 4.1, 0.1),value=0.,format_func=lambda x: f'{x:.2f}',on_change=restart_run_button)
         # store the value so that its not reset after t_max is changed
         if 'pulse_max' not in st.session_state:
             st.session_state.pulse_max=0.

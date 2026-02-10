@@ -108,12 +108,12 @@ def CDW_tab(params:dict[str, float|str],simulation_details:SimDetails):
             ]
             
         fig_re=go.Figure(
-            data=create_fig_data(lambda x: np.real(x), FT_data,x_vals),
+            data=create_fig_data(lambda x: np.real(x), FT_data,locations),
             layout=layout_for_FT
         )
         fig_re.update_layout({"yaxis":dict(title=r'$Re\rho(x,\omega)$')})
         fig_im=go.Figure(
-            data=create_fig_data(lambda x: np.abs(np.imag(x)),FT_data,x_vals),
+            data=create_fig_data(lambda x: np.abs(np.imag(x)),FT_data,locations),
             layout=layout_for_FT
         )
         fig_im.update_layout({"yaxis":dict(title=r'-$Im\rho(x,\omega)$')})
