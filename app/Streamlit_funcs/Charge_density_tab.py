@@ -77,53 +77,68 @@ def CDW_tab(params:dict[str, float|str],simulation_details:SimDetails):
                     margin={"t":25,"b":1}
                 )
 
-    time_ranges.sort()
-    t_init=time_ranges[0]
-    t_init_loc=np.argwhere(np.abs(t_range-t_init)<1e-5)[0][0]
-    
-    x_vals= list(map(lambda x: int(x*simulation_details.x_points_per_unit),locations))
-    for t_end in time_ranges[1:]:
-        st.subheader(f'F.T transform from {t_init:.3f}-{t_end:.3f}',text_alignment='center',divider=True)
-        st.divider(width='stretch')
-        cols=st.columns(2)
-        t_end_loc=np.argwhere(np.abs(t_range-t_end)<1e-5)[0][0]            
+        time_ranges.sort()
+        t_init=time_ranges[0]
+        t_init_loc=np.argwhere(np.abs(t_range-t_init)<1e-5)[0][0]
+        
+        x_vals= list(map(lambda x: int(x*simulation_details.x_points_per_unit),locations))
+        for t_end in time_ranges[1:]:
+            st.subheader(f'F.T transform from {t_init:.3f}-{t_end:.3f}',text_alignment='center',divider=True)
+            st.divider(width='stretch')
+            cols=st.columns(2)
+            t_end_loc=np.argwhere(np.abs(t_range-t_end)<1e-5)[0][0]            
+                
+            FT_data=np.array([np.fft.fft(
+                data_PDE[t_init_loc:t_end_loc,0,x_loc]*np.cos(params['q_0']*x_loc/simulation_details.x_points_per_unit +data_PDE[t_init_loc:t_end_loc,1,x_loc])
+                ) for x_loc in x_vals])
+            omega_range=np.arange(len(FT_data[0])//2)
             
-        FT_data=np.array([np.fft.fft(
-            data_PDE[t_init_loc:t_end_loc,0,x_loc]*np.cos(params['q_0']*x_loc/simulation_details.x_points_per_unit +data_PDE[t_init_loc:t_end_loc,1,x_loc])
-            ) for x_loc in x_vals])
-        omega_range=np.arange(len(FT_data[0])//2)
+            FT_data_full=np.array([np.fft.fft(
+                data_PDE[t_init_loc:t_end_loc,0,x_loc]*np.cos(params['q_0']*x_loc/simulation_details.x_points_per_unit +data_PDE[t_init_loc:t_end_loc,1,x_loc])
+                ) for x_loc in np.arange(len(x_range))])
+            FT_total=np.sum(FT_data_full,axis=0)/len(FT_data_full)
+            #print(f'I avg over {len(FT_data_full)} points in ({FT_data_full.shape}) data set and get {FT_total.shape}-points')
 
-        def create_fig_data(func,data_set,points_set):
-            '''
-            Wrapper function to plot lines
-            func: is either np.real or np.imag for
-            the case I'm using
-            '''
-            return [
-                go.Scatter(
-                    x=omega_range,y=(func)(data_subset),
-                    mode='lines+markers',name=f'x={(points_set[temp_it]):.2f}'
-                ) for temp_it,data_subset in enumerate(data_set)
+            def create_fig_data(func,data_set,points_set):
+                '''
+                Wrapper function to plot lines
+                func: is either np.real or np.imag for
+                the case I'm using
+                '''
+                res=[
+                    go.Scatter(
+                        x=omega_range,y=(func)(data_subset),
+                        mode='lines+markers',name=f'x={(points_set[temp_it]):.2f}'
+                    ) for temp_it,data_subset in enumerate(data_set)
+                ]
+                res.append(go.Scatter(
+                        x=omega_range,y=(func)(FT_total),
+                        mode='lines+markers',name=f'avg. signal',line=dict(color='black',dash='dash'),
+                        fill='tozeroy'
+                        )
+                )
+                return res
 
-            ]
-            
-        fig_re=go.Figure(
-            data=create_fig_data(lambda x: np.real(x), FT_data,locations),
-            layout=layout_for_FT
-        )
-        fig_re.update_layout({"yaxis":dict(title=r'$Re\rho(x,\omega)$')})
-        fig_im=go.Figure(
-            data=create_fig_data(lambda x: np.abs(np.imag(x)),FT_data,locations),
-            layout=layout_for_FT
-        )
-        fig_im.update_layout({"yaxis":dict(title=r'-$Im\rho(x,\omega)$')})
-        with cols[0]:
-            st.subheader('Real Part',text_alignment='center')
-            st.plotly_chart(fig_re,width='stretch',config={'responsive': True},key=f're_FFT_{t_init:.3f}_{t_end:.3f}_{t_end_loc}_{x_vals}')
-        with cols[1]:                
-            st.subheader('Imaginary Part',text_alignment='center')
-            st.plotly_chart(fig_im,width='stretch',config={'responsive': True},key=f'im_FFT_{t_init:.3f}_{t_end:.3f}_{t_end_loc}_{x_vals}')
+            fig_re=go.Figure(
+                data=create_fig_data(lambda x: np.real(x), FT_data,locations),
+                layout=layout_for_FT
+            )
+            fig_re.update_layout({"yaxis":dict(title=r'$Re\rho(x,\omega)$')})
+            fig_re.update_layout({'xaxis':dict(range=[omega_range[0],omega_range[-1]])})
 
-        t_init,t_init_loc=t_end,t_end_loc
+            fig_im=go.Figure(
+                data=create_fig_data(lambda x: np.abs(np.imag(x)),FT_data,locations),
+                layout=layout_for_FT
+            )
+            fig_im.update_layout({"yaxis":dict(title=r'-$Im\rho(x,\omega)$')})
+            fig_im.update_layout({'xaxis':dict(range=[omega_range[0],omega_range[-1]])})
+            with cols[0]:
+                st.subheader('Real Part',text_alignment='center')
+                st.plotly_chart(fig_re,width='stretch',config={'responsive': True},key=f're_FFT_{t_init:.3f}_{t_end:.3f}_{t_end_loc}_{x_vals}')
+            with cols[1]:                
+                st.subheader('Imaginary Part',text_alignment='center')
+                st.plotly_chart(fig_im,width='stretch',config={'responsive': True},key=f'im_FFT_{t_init:.3f}_{t_end:.3f}_{t_end_loc}_{x_vals}')
+
+            t_init,t_init_loc=t_end,t_end_loc
 
 

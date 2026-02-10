@@ -1,0 +1,14 @@
+[theme]
+base="light"
+backgroundColor="mintCream"
+secondaryBackgroundColor="lavender"
+codeBackgroundColor="powderBlue"
+baseRadius="full"
+font="monospace"
+baseFontSize=14
+
+
+[theme.sidebar]
+backgroundColor="aliceBlue"
+primaryColor="black"
+secondaryBackgroundColor="lavender"
