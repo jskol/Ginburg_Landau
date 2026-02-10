@@ -12,6 +12,6 @@ params_name_dict={
     'm_phi':['m_phi', np.arange(1,200,1),110],
     'q_0':['CDW wave vector', np.arange(1.,7,0.1),5.9],
     'N':['System size', np.arange(40),6],
-    't_max': ['max evolution time', np.arange(10,200,1),12],
+    't_max': ['max evolution time', np.arange(1,200,1),2],
 }
 

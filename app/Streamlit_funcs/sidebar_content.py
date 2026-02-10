@@ -10,13 +10,15 @@ from equation_class.GL_equations_params import params_name_dict
 # run_button functionalities ##
 def restart_run_button():
     st.session_state.run_button_active=True
+
 def disable_run_button():
     st.session_state.run_button_active=False
     st.session_state.run_calc=True
 
+
 def restart_to_file():
     restart_run_button()
-    st.session_state.to_file =not st.session_state.to_file
+    #st.session_state.to_file =not st.session_state.to_file
 
 @st.fragment
 def sidebar_content(params: dict[str,float|str]):
@@ -51,7 +53,7 @@ def sidebar_content(params: dict[str,float|str]):
         params['impurity']=imp_str
 
     with st.expander('Driving'):
-        driving_str=st.select_slider('Pulse strength',options=np.arange(-1., 1.1, 0.1),value=0.,format_func=lambda x: f'{x:.2f}',on_change=restart_run_button)
+        driving_str=st.select_slider('Pulse strength',options=np.arange(-2.1, 2.1, 0.1),value=0.,format_func=lambda x: f'{x:.2f}',on_change=restart_run_button)
         # store the value so that its not reset after t_max is changed
         if 'pulse_max' not in st.session_state:
             st.session_state.pulse_max=0.
@@ -61,15 +63,62 @@ def sidebar_content(params: dict[str,float|str]):
 
         params['driving']=f'{driving_str}*exp(-0.5*(t- {pulse_max})**2)*cos(2.*(t - {pulse_max}))'
         
-        add_Joule=st.toggle('Joule heating',value=False,on_change=restart_run_button)
+        add_Joule=st.toggle('Joule heating',value=False,on_change=restart_run_button,help='a-parameter (controlling the CDW) becomes linked with the driving')
         params['Joule']=add_Joule
     
-    st.session_state.to_file=st.toggle('Save results directly to file',value=False,on_change=restart_to_file,
-                                       help='Preferred for larger calculations, but can be problematic on free domains')
-
-    
-
+        
     #Run Calc button
     if st.button('Run Simulation',width='stretch',type='primary',disabled=not st.session_state.run_button_active,on_click=disable_run_button):
         st.rerun()
+ 
+ 
+def download_sidebar():
 
+    def toggle_action():
+        print(f'toggle is {st.session_state.to_file}')
+        if st.session_state.to_file and st.session_state.has_data:
+            st.session_state.needs_rerun=True 
+        st.session_state.run_button_active=True
+        
+
+   # Heavy calculations -> do not store in memory
+    st.toggle('Save results directly to file',value=False,key='to_file',on_change=toggle_action,
+                                       help='Preferred for larger calculations, but can be problematic on free domains')        
+
+    if st.session_state.needs_rerun:
+        st.rerun()
+
+    print(st.session_state.to_file, " ", st.session_state.needs_rerun)
+    if 'was_downloaded' not in st.session_state:
+            st.session_state.was_downloaded=False
+
+    def download_click():
+        st.session_state.to_file=False
+        st.session_state.was_downloaded=True
+        st.session_state.run_button_active=True
+        
+
+    if st.session_state.to_file and st.session_state.has_data:
+        out_name='out.hdmf5'
+        try :
+            with open(out_name, "rb") as f:
+                st.download_button(
+                        label='Download data',
+                        data=f,
+                        on_click=download_click,
+                        type='primary',
+                        file_name=out_name,
+                        mime="application/x-hdmf5",
+                        key='Download_sidebar'
+                )
+
+            if st.session_state.was_downloaded:
+                try:
+                    os.remove(out_name)
+                except FileNotFoundError:
+                    print('File not Found')
+                finally:
+                    st.session_state.was_downloaded=False
+                    st.session_state.has_data=False            
+        except FileNotFoundError:
+            st.rerun()
