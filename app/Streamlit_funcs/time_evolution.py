@@ -66,11 +66,6 @@ def add_time_evolution_slider(data_PDE:pde.storage.memory.MemoryStorage,sim_deta
 
     fig=make_subplots(rows=2,cols=1,shared_xaxes=True,vertical_spacing=0.05)
     x_axis=np.arange(data_PDE.data[0].shape[-1])/sim_details.x_points_per_unit
-    #fix phase
-    #for data_set in data_PDE.data:
-    #    data_set[1] = np.mod(data_set[1]+np.pi,2*np.pi)-np.pi
-
-
 
     for solution in solutions_to_showcase.values():
         fig.add_trace(go.Scatter(x=x_axis, y=data_PDE.data[0][solution], mode="lines+markers"), row=1+solution, col=1)

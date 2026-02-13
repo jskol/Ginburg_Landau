@@ -8,6 +8,8 @@ sys.path.append(curr_dir)
 
 #Solve the thing
 #run the calculations only if triggered
+#using st.session dict
+
 if 'run_calc' not in st.session_state:
     st.session_state.run_calc=False
     
@@ -23,6 +25,9 @@ if 'needs_rerun' not in st.session_state:
 if 'PDE_res' not in st.session_state:
     st.session_state.PDE_res=None    
 
+if 'uploaded_file' not in st.session_state:
+    st.session_state.uploaded_file=0
+
 ## Create a sidebar to set the parameters of the model
 from Streamlit_funcs.sidebar_content import sidebar_content,download_sidebar,file_uploader
 with st.sidebar:
@@ -30,6 +35,7 @@ with st.sidebar:
     if 'run_button_active' not in st.session_state:
         st.session_state.run_button_active=True
     sidebar_content(params)
+
 
 ## Now the main page
 #Title
@@ -49,8 +55,8 @@ if st.session_state.run_calc or st.session_state.needs_rerun:
         # Remove the existing "old data"
         if os.path.exists(out_name):
             os.remove(out_name)
-
         st.session_state.PDE_res = GL_PDE.solve(to_file=st.session_state.to_file)
+
     st.session_state.has_data=True
     st.session_state.run_calc=False
     st.session_state.needs_rerun=False

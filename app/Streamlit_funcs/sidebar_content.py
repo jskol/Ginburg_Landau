@@ -14,10 +14,8 @@ def disable_run_button():
     st.session_state.run_button_active=False
     st.session_state.run_calc=True
 
-
 def restart_to_file():
     restart_run_button()
-    #st.session_state.to_file =not st.session_state.to_file
 
 @st.fragment
 def sidebar_content(params: dict[str,float|str]):
@@ -68,6 +66,7 @@ def sidebar_content(params: dict[str,float|str]):
         
     #Run Calc button
     if st.button('Run Simulation',width='stretch',type='primary',disabled=not st.session_state.run_button_active,on_click=disable_run_button):
+        st.session_state.uploaded_file +=1 
         st.rerun()
  
 
@@ -78,29 +77,29 @@ def file_uploader():
     uploaded_file = st.file_uploader(
         "Upload data", 
         accept_multiple_files=False,
-        type="hdmf5"
+        type="hdmf5",
+        key=f'Uploader_{st.session_state.uploaded_file}',on_change=restart_run_button
     )
+
+    """
+    Brutal workaround with class mocking the storage of py-pde
+    """
     class storage_mock:
         def __init__(self,times,data):
             self.times=times
             self.data=data
     
-
     if uploaded_file is not None:
         try:
             with h5py.File(uploaded_file, 'r') as f:
-                keys = list(f.keys())
-                print(keys)
                 storage=storage_mock(f['times'][:],f['data'][:])
                 st.session_state.PDE_res=storage
-            
             st.session_state.has_data=True
-        
         except Exception as e:
             st.error(f"Błąd podczas odczytu pliku: {e}")
- 
-def download_sidebar():
+    
 
+def download_sidebar():
     def toggle_action():
         print(f'toggle is {st.session_state.to_file}')
         if st.session_state.to_file and st.session_state.has_data:
