@@ -20,8 +20,11 @@ if 'has_data' not in st.session_state:
 if 'needs_rerun' not in st.session_state:
     st.session_state.needs_rerun=False
 
+if 'PDE_res' not in st.session_state:
+    st.session_state.PDE_res=None    
+
 ## Create a sidebar to set the parameters of the model
-from Streamlit_funcs.sidebar_content import sidebar_content,download_sidebar
+from Streamlit_funcs.sidebar_content import sidebar_content,download_sidebar,file_uploader
 with st.sidebar:
     params={} #initiate empty dict of params
     if 'run_button_active' not in st.session_state:
@@ -41,8 +44,6 @@ GL_PDE=init_PDE(params,simulation_details)
 out_name='out.hdmf5'
 
 
-
-
 if st.session_state.run_calc or st.session_state.needs_rerun:
     with st.spinner('Calculating',width='stretch'):
         # Remove the existing "old data"
@@ -56,6 +57,7 @@ if st.session_state.run_calc or st.session_state.needs_rerun:
     
 with st.sidebar:
     download_sidebar()
+    file_uploader()
 
 
 tab_time_evolution,tab_FT,tab_CDW = st.tabs(['Time evolution sample','Time evolution local','Charge density'])
@@ -66,7 +68,6 @@ with tab_time_evolution:
 from Streamlit_funcs.Local_evolution_tab import display_time_evolution_local
 with tab_FT:
     display_time_evolution_local(simulation_details)
-
 
 from Streamlit_funcs.Charge_density_tab import CDW_tab
 with tab_CDW:

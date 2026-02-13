@@ -97,7 +97,6 @@ def CDW_tab(params:dict[str, float|str],simulation_details:SimDetails):
                 data_PDE[t_init_loc:t_end_loc,0,x_loc]*np.cos(params['q_0']*x_loc/simulation_details.x_points_per_unit +data_PDE[t_init_loc:t_end_loc,1,x_loc])
                 ) for x_loc in np.arange(len(x_range))])
             FT_total=np.sum(FT_data_full,axis=0)/len(FT_data_full)
-            #print(f'I avg over {len(FT_data_full)} points in ({FT_data_full.shape}) data set and get {FT_total.shape}-points')
 
             def create_fig_data(func,data_set,points_set):
                 '''

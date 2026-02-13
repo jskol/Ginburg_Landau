@@ -1,9 +1,8 @@
 import streamlit as st
 import numpy as np
-import os,sys
+import os,sys,pde
 curr_dir=os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(curr_dir))
-import numpy as np
 from equation_class.GL_equations_params import params_name_dict
 
 
@@ -71,6 +70,34 @@ def sidebar_content(params: dict[str,float|str]):
     if st.button('Run Simulation',width='stretch',type='primary',disabled=not st.session_state.run_button_active,on_click=disable_run_button):
         st.rerun()
  
+
+
+import h5py
+
+def file_uploader():
+    uploaded_file = st.file_uploader(
+        "Upload data", 
+        accept_multiple_files=False,
+        type="hdmf5"
+    )
+    class storage_mock:
+        def __init__(self,times,data):
+            self.times=times
+            self.data=data
+    
+
+    if uploaded_file is not None:
+        try:
+            with h5py.File(uploaded_file, 'r') as f:
+                keys = list(f.keys())
+                print(keys)
+                storage=storage_mock(f['times'][:],f['data'][:])
+                st.session_state.PDE_res=storage
+            
+            st.session_state.has_data=True
+        
+        except Exception as e:
+            st.error(f"Błąd podczas odczytu pliku: {e}")
  
 def download_sidebar():
 
